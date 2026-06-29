@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三個月衝刺計畫</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --card: #1a1a1a;
+    --card2: #222;
+    --border: #2a2a2a;
+    --text: #f0f0f0;
+    --muted: #888;
+    --blue: #4a9eff;
+    --blue-bg: #0d2a4a;
+    --purple: #a78bfa;
+    --purple-bg: #1e1040;
+    --green: #4ade80;
+    --green-bg: #0d2a1a;
+    --amber: #fbbf24;
+    --amber-bg: #2a1f00;
+    --red: #f87171;
+    --red-bg: #2a0d0d;
+    --teal: #2dd4bf;
+    --teal-bg: #0d2a28;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif; min-height: 100vh; }
+
+  .nav { display: flex; overflow-x: auto; gap: 4px; padding: 12px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn { flex-shrink: 0; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .nav-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  .page { display: none; padding: 16px; max-width: 480px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .card-sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+
+  .bar-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+  .bar-label { font-size: 12px; color: var(--muted); width: 68px; flex-shrink: 0; }
+  .bar-bg { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .bar-val { font-size: 12px; color: var(--muted); width: 36px; text-align: right; flex-shrink: 0; }
+
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin: 2px; }
+  .tag-blue { background: var(--blue-bg); color: var(--blue); }
+  .tag-purple { background: var(--purple-bg); color: var(--purple); }
+  .tag-green { background: var(--green-bg); color: var(--green); }
+  .tag-amber { background: var(--amber-bg); color: var(--amber); }
+  .tag-teal { background: var(--teal-bg); color: var(--teal); }
+
+  .time-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .time-row:last-child { border-bottom: none; }
+  .time-col { width: 60px; color: var(--muted); flex-shrink: 0; font-size: 12px; padding-top: 1px; }
+  .time-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 6px; margin-bottom: 2px; }
+
+  .ex-item { border-top: 1px solid var(--border); padding: 12px 0; }
+  .ex-item:first-child { border-top: none; padding-top: 0; }
+  .ex-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--green-bg); color: var(--green); font-size: 11px; font-weight: 600; margin-right: 6px; }
+  .ex-name { font-size: 14px; font-weight: 600; display: inline; }
+  .ex-sets { font-size: 12px; color: var(--blue); margin: 4px 0; }
+  .ex-how { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .ex-feel { font-size: 11px; color: #666; margin-top: 4px; font-style: italic; }
+
+  .sub-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+  .sub-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
+  .sub-btn.active { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+  .sub-content { display: none; }
+  .sub-content.active { display: block; }
+
+  .phase-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .phase-btn { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; text-align: center; }
+  .phase-btn.active { background: var(--teal-bg); color: var(--teal); border-color: var(--teal); }
+  .phase-content { display: none; }
+  .phase-content.active { display: block; }
+
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .check-item:last-child { border-bottom: none; }
+  .check-box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; }
+  .check-box.done { background: var(--green); border-color: var(--green); }
+  .check-box.done::after { content: '✓'; color: #000; font-size: 12px; font-weight: 700; }
+  .check-text { font-size: 13px; line-height: 1.5; }
+  .check-text.done { color: var(--muted); text-decoration: line-through; }
+
+  .section-h { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 10px; }
+  .section-h:first-child { margin-top: 0; }
+
+  .note { background: var(--card2); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 10px 12px; font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 12px; }
+  .note strong { color: var(--text); }
+  .note-green { border-left-color: var(--green); }
+  .note-amber { border-left-color: var(--amber); }
+  .note-teal { border-left-color: var(--teal); }
+
+  .warm { background: var(--amber-bg); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--amber); line-height: 1.7; margin-bottom: 12px; }
+
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 12px; }
+  .week-cell { text-align: center; }
+  .week-name { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+  .week-badge { font-size: 10px; padding: 3px 2px; border-radius: 4px; }
+  .wb-s { background: var(--purple-bg); color: var(--purple); }
+  .wb-c { background: var(--blue-bg); color: var(--blue); }
+  .wb-r { background: var(--card2); color: var(--muted); }
+  .wb-g { background: var(--green-bg); color: var(--green); }
+
+  .today-card { background: linear-gradient(135deg, #0d2a4a, #1e1040); border: 1px solid var(--blue); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+  .today-label { font-size: 11px; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .today-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .today-sub { font-size: 13px; color: var(--muted); }
+  .countdown-row { display: flex; gap: 8px; margin-top: 12px; }
+  .countdown-box { flex: 1; background: var(--card2); border-radius: 8px; padding: 10px; text-align: center; }
+  .countdown-num { font-size: 24px; font-weight: 700; color: var(--blue); }
+  .countdown-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .zone2-box { background: var(--teal-bg); border: 1px solid var(--teal); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+  .zone2-title { font-size: 13px; font-weight: 600; color: var(--teal); margin-bottom: 6px; }
+  .zone2-bpm { font-size: 28px; font-weight: 700; color: var(--teal); }
+  .zone2-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .venue-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .venue-box { flex: 1; background: var(--card2); border-radius: 8px; padding: 10px; font-size: 12px; }
+  .venue-title { color: var(--teal); font-weight: 600; margin-bottom: 4px; }
+  .venue-time { color: var(--text); margin-bottom: 2px; }
+  .venue-note { color: var(--muted); font-size: 11px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('home')">🏠 首頁</button>
+  <button class="nav-btn" onclick="showPage('schedule')">📅 時間表</button>
+  <button class="nav-btn" onclick="showPage('study')">📚 讀書</button>
+  <button class="nav-btn" onclick="showPage('workout')">💪 運動</button>
+  <button class="nav-btn" onclick="showPage('checklist')">✅ 打卡</button>
+</nav>
+
+<!-- 首頁 -->
+<div id="page-home" class="page active">
+  <div class="today-card">
+    <div class="today-label">今天</div>
+    <div class="today-title" id="today-date">載入中...</div>
+    <div class="today-sub" id="today-day"></div>
+    <div class="countdown-row">
+      <div class="countdown-box">
+        <div class="countdown-num" id="days-toeic">—</div>
+        <div class="countdown-label">多益剩餘天</div>
+      </div>
+      <div class="countdown-box">
+        <div class="countdown-num" id="days-exam">—</div>
+        <div class="countdown-label">畢業考剩餘天</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="zone2-box">
+    <div class="zone2-title">🍎 Apple Watch Zone 2 燃脂區</div>
+    <div class="zone2-bpm">118–138 bpm</div>
+    <div class="zone2-label">最大心率約197（220-23歲）× 60–70%</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6;">運動時打開 Apple Watch 心率顯示，維持在這個區間就是燃脂最有效的狀態。可以說話但有點喘，就是對了。</div>
+  </div>
+
+  <div class="section-h">場地開放時間</div>
+  <div class="phase-tabs">
+    <button class="phase-btn active" onclick="showPhase('venue','v-summer')">7–8月暑假</button>
+    <button class="phase-btn" onclick="showPhase('venue','v-sep')">9月開學後</button>
+  </div>
+  <div id="v-summer" class="phase-content active">
+    <div class="venue-row">
+      <div class="venue-box">
+        <div class="venue-title">🏊 游泳池</div>
+        <div class="venue-time">週一到週五</div>
+        <div class="venue-time">上午 06:30–09:00</div>
+        <div class="venue-time">下午 16:00–20:30</div>
+        <div class="venue-note">週六日休館</div>
+      </div>
+      <div class="venue-box">
+        <div class="venue-title">🏋️ 健身房</div>
+        <div class="venue-time">週一到週六</div>
+        <div class="venue-time">12:00–15:00</div>
+        <div class="venue-note">費用 300元／月</div>
+        <div class="venue-note">爬坡機在這裡</div>
+      </div>
+    </div>
+    <div class="note note-amber">📌 游泳選下午 16:00–20:30，配合你的作息。週六游泳池休館，改在家做健身環＋拳擊。</div>
+  </div>
+  <div id="v-sep" class="phase-content">
+    <div class="venue-row">
+      <div class="venue-box">
+        <div class="venue-title">🏊 游泳池</div>
+        <div class="venue-time">週一到週六</div>
+        <div class="venue-time">上午 06:30–09:00</div>
+        <div class="venue-time">下午 16:00–20:30</div>
+        <div class="venue-note">週日休館</div>
+      </div>
+      <div class="venue-box">
+        <div class="venue-title">🏋️ 健身房</div>
+        <div class="venue-time">開學後正常開放</div>
+        <div class="venue-note">爬坡機在這裡</div>
+      </div>
+    </div>
+    <div class="note note-green">📌 9月游泳可以排週一到週六，彈性更大。</div>
+  </div>
+
+  <div class="section-h">三個月節奏</div>
+  <div class="card">
+    <div class="card-title">🔵 7月 打底期</div>
+    <div class="card-sub">建立習慣，影片跟上，單字開始背</div>
+    <div class="bar-row"><span class="bar-label">多益</span><div class="bar-bg"><div class="bar-fill" style="width:55%;background:var(--blue)"></div></div><span class="bar-val">55%</span></div>
+    <div class="bar-row"><span class="bar-label">民法／刑法</span><div class="bar-bg"><div class="bar-fill" style="width:35%;background:var(--purple)"></div></div><span class="bar-val">35%</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🟣 8月 強化期</div>
+    <div class="card-sub">法科考古題開始刷，多益每週模擬</div>
+    <div class="bar-row"><span class="bar-label">多益</span><div class="bar-bg"><div class="bar-fill" style="width:40%;background:var(--blue)"></div></div><span class="bar-val">40%</span></div>
+    <div class="bar-row"><span class="bar-label">民法／刑法</span><div class="bar-bg"><div class="bar-fill" style="width:50%;background:var(--purple)"></div></div><span class="bar-val">50%</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🟢 9月 衝刺期</div>
+    <div class="card-sub">9/20 多益考試，法科全力衝</div>
+    <div class="bar-row"><span class="bar-label">多益</span><div class="bar-bg"><div class="bar-fill" style="width:30%;background:var(--blue)"></div></div><span class="bar-val">30%</span></div>
+    <div class="bar-row"><span class="bar-label">民法／刑法</span><div class="bar-bg"><div class="bar-fill" style="width:65%;background:var(--purple)"></div></div><span class="bar-val">65%</span></div>
+  </div>
+
+  <div class="section-h">執行法則</div>
+  <div class="note"><strong>手機放浴室</strong> 10:00開始讀書就放過去，25分鐘番茄鐘才能去拿</div>
+  <div class="note"><strong>前一晚決定明天讀什麼</strong> 睡前3分鐘寫下明天法科哪集、多益練哪個</div>
+  <div class="note"><strong>狀態差就去整理房間</strong> 拖地、洗衣服，做完反而清醒</div>
+  <div class="note"><strong>週日真正休息</strong> 不要因為罪惡感硬讀</div>
+</div>
+
+<!-- 時間表 -->
+<div id="page-schedule" class="page">
+  <div class="section-h">每週運動總覽</div>
+  <div class="phase-tabs">
+    <button class="phase-btn active" onclick="showPhase('sched','s-summer')">7–8月暑假</button>
+    <button class="phase-btn" onclick="showPhase('sched','s-sep')">9月開學後</button>
+  </div>
+
+  <div id="s-summer" class="phase-content active">
+    <div class="week-grid">
+      <div class="week-cell"><div class="week-name">一</div><div class="week-badge wb-s">上半身</div></div>
+      <div class="week-cell"><div class="week-name">二</div><div class="week-badge wb-c">游泳</div></div>
+      <div class="week-cell"><div class="week-name">三</div><div class="week-badge wb-s">下半身</div></div>
+      <div class="week-cell"><div class="week-name">四</div><div class="week-badge wb-c">游泳</div></div>
+      <div class="week-cell"><div class="week-name">五</div><div class="week-badge wb-s">上半身</div></div>
+      <div class="week-cell"><div class="week-name">六</div><div class="week-badge wb-g">健身環</div></div>
+      <div class="week-cell"><div class="week-name">日</div><div class="week-badge wb-r">休息</div></div>
+    </div>
+    <div class="note note-amber">週六游泳池休館，改做健身環＋拳擊遊戲有氧。健身房 12:00–15:00 可做重訓。</div>
+  </div>
+
+  <div id="s-sep" class="phase-content">
+    <div class="week-grid">
+      <div class="week-cell"><div class="week-name">一</div><div class="week-badge wb-s">上半身</div></div>
+      <div class="week-cell"><div class="week-name">二</div><div class="week-badge wb-c">游泳</div></div>
+      <div class="week-cell"><div class="week-name">三</div><div class="week-badge wb-s">下半身</div></div>
+      <div class="week-cell"><div class="week-name">四</div><div class="week-badge wb-c">游泳</div></div>
+      <div class="week-cell"><div class="week-name">五</div><div class="week-badge wb-s">上半身</div></div>
+      <div class="week-cell"><div class="week-name">六</div><div class="week-badge wb-c">游泳</div></div>
+      <div class="week-cell"><div class="week-name">日</div><div class="week-badge wb-r">休息</div></div>
+    </div>
+    <div class="note note-green">9月游泳池週六也開放，可以游三次。</div>
+  </div>
+
+  <div class="section-h">每天時間安排</div>
+  <div class="card" style="padding:12px 16px;">
+    <div class="time-row"><div class="time-col">09:30</div><div class="time-content"><span class="time-badge tag-amber">起床吃早餐，30分鐘緩衝</span></div></div>
+    <div class="time-row"><div class="time-col">10:00</div><div class="time-content"><span class="time-badge tag-blue">多益單字 30個（Anki）</span></div></div>
+    <div class="time-row"><div class="time-col">10:30</div><div class="time-content"><span class="time-badge tag-blue">多益閱讀練習</span></div></div>
+    <div class="time-row"><div class="time-col">12:00</div><div class="time-content"><span class="time-badge tag-amber">午餐（健身房日可順便去）</span></div></div>
+    <div class="time-row"><div class="time-col">13:30</div><div class="time-content"><span class="time-badge tag-purple">法科補習班影片 2集</span></div></div>
+    <div class="time-row"><div class="time-col">15:30</div><div class="time-content"><span class="time-badge tag-purple">法科讀書／考古題</span></div></div>
+    <div class="time-row"><div class="time-col">16:00</div><div class="time-content"><span class="time-badge tag-green">運動（游泳／重訓／健身環）</span></div></div>
+    <div class="time-row"><div class="time-col">18:00</div><div class="time-content"><span class="time-badge tag-amber">晚餐洗澡</span></div></div>
+    <div class="time-row"><div class="time-col">20:00</div><div class="time-content"><span class="time-badge tag-purple">複習法科筆記 / 一三五家教</span></div></div>
+    <div class="time-row"><div class="time-col">21:00</div><div class="time-content"><span class="time-badge tag-blue">多益聽力podcast / 單字複習</span></div></div>
+    <div class="time-row" style="border:none;"><div class="time-col">22:00+</div><div class="time-content"><span class="time-badge" style="background:#1a1a1a;color:#888;">自由時間／整理房間</span></div></div>
+  </div>
+
+  <div class="section-h">家務安排</div>
+  <div class="card">
+    <div class="time-row" style="padding:6px 0;"><div class="time-col" style="width:80px;">每2–3天</div><div style="font-size:13px;">洗衣服（丟進去繼續讀書）</div></div>
+    <div class="time-row" style="padding:6px 0;"><div class="time-col" style="width:80px;">每週一次</div><div style="font-size:13px;">拖地（讀書狀態差的下午）</div></div>
+    <div class="time-row" style="padding:6px 0;border:none;"><div class="time-col" style="width:80px;">每兩週</div><div style="font-size:13px;">洗棉被娃娃枕頭</div></div>
+  </div>
+</div>
+
+<!-- 讀書 -->
+<div id="page-study" class="page">
+  <div class="section-h">多益目標 750+（現在500）</div>
+  <div class="note"><strong>核心問題：</strong>單字量不足導致閱讀慢、聽力猜不到。把單字補起來，兩個同時進步。</div>
+  <div class="card">
+    <div class="card-title">📘 每天多益任務</div>
+    <div class="time-row"><div class="time-col">早上</div><div class="time-content" style="font-size:13px;">背30個新單字（Anki）</div></div>
+    <div class="time-row"><div class="time-col">上午</div><div class="time-content" style="font-size:13px;">閱讀練習 Part 6–7，計時做</div></div>
+    <div class="time-row" style="border:none;"><div class="time-col">晚上</div><div class="time-content" style="font-size:13px;">聽力podcast或複習Anki單字</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📗 每天法科任務</div>
+    <div class="time-row"><div class="time-col">下午</div><div class="time-content" style="font-size:13px;">補習班影片 2集（1.5倍速）</div></div>
+    <div class="time-row"><div class="time-col">下午</div><div class="time-content" style="font-size:13px;">課本整理重點，一頁紙筆記法</div></div>
+    <div class="time-row" style="border:none;"><div class="time-col">晚上</div><div class="time-content" style="font-size:13px;">複習今天筆記，8月後刷考古題</div></div>
+  </div>
+  <div class="section-h">三個月進度</div>
+  <div class="card"><div class="card-title">7月 打底</div><div style="font-size:13px;color:var(--muted);line-height:1.9;margin-top:8px;">✦ 民法基礎課程開始，每天2集<br>✦ 每天背單字，開始計時閱讀<br>✦ 目標：建立習慣，不求快</div></div>
+  <div class="card"><div class="card-title">8月 強化</div><div style="font-size:13px;color:var(--muted);line-height:1.9;margin-top:8px;">✦ 法科開始做考古題，找出弱點<br>✦ 多益每週1次完整模擬測驗<br>✦ 目標：弄懂出題方向</div></div>
+  <div class="card"><div class="card-title">9月 衝刺</div><div style="font-size:13px;color:var(--muted);line-height:1.9;margin-top:8px;">✦ 9/20 多益考試，考前一週模擬<br>✦ 法科反覆刷考古題＋錯題回頭看<br>✦ 重複率最高的重點優先</div></div>
+  <div class="section-h">自律技巧</div>
+  <div class="note"><strong>番茄鐘：</strong>讀25分鐘休息5分鐘</div>
+  <div class="note"><strong>手機放浴室：</strong>物理隔離，不是翻面</div>
+  <div class="note"><strong>前一晚決定明天讀什麼：</strong>起床直接照做</div>
+</div>
+
+<!-- 運動 -->
+<div id="page-workout" class="page">
+  <div class="zone2-box" style="margin-bottom:12px;">
+    <div class="zone2-title">🍎 Zone 2 燃脂區間</div>
+    <div class="zone2-bpm">118–138 bpm</div>
+    <div class="zone2-label">維持在這個心跳，脂肪燃燒效率最高</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:6px;">可以說話但有點喘 = 正確。太喘說不出話 = 太強，放慢。完全不喘 = 太輕，加快。</div>
+  </div>
+
+  <div class="note note-amber" style="margin-bottom:12px;"><strong>目標體重建議：50–53公斤</strong>（不是45，那樣BMI過低）。體脂降低＋肌肉線條才會出現馬甲線。骨盆前傾靠每天核心改善。</div>
+
+  <div class="sub-tabs">
+    <button class="sub-btn active" onclick="showSub('w-upper')">上半身</button>
+    <button class="sub-btn" onclick="showSub('w-swim')">游泳</button>
+    <button class="sub-btn" onclick="showSub('w-lower')">下半身</button>
+    <button class="sub-btn" onclick="showSub('w-gym')">健身房</button>
+    <button class="sub-btn" onclick="showSub('w-core')">每天核心</button>
+    <button class="sub-btn" onclick="showSub('w-rain')">週六／下雨</button>
+  </div>
+
+  <!-- 上半身 -->
+  <div id="w-upper" class="sub-content active">
+    <div class="card" style="font-size:12px;color:var(--muted);margin-bottom:12px;">週一、五｜約50分鐘｜啞鈴3kg×2、椅子、健身環</div>
+    <div class="warm">🔥 熱身3分鐘<br>手臂前繞10下→後繞10下→肩膀前轉10圈→後轉10圈→原地踏步30秒</div>
+    <div class="card">
+      <div class="ex-item">
+        <span class="ex-num">1</span><span class="ex-name">啞鈴划船</span>
+        <div class="ex-sets">4組 × 每側12下｜組間休息60秒</div>
+        <div class="ex-how">左手扶椅背，身體前傾45度，右手握啞鈴垂下。手肘彎曲往上拉到腰部旁邊，頂部停1秒感覺背夾緊，慢慢放下。右12下換左，這樣算1組。</div>
+        <div class="ex-feel">→ 背部中間兩側痠，不是手臂用力</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">2</span><span class="ex-name">啞鈴肩推</span>
+        <div class="ex-sets">3組 × 12下｜組間休息60秒</div>
+        <div class="ex-how">坐椅子背打直，雙手握啞鈴舉到耳朵旁手肘彎90度掌心朝前。往上推到手臂幾乎打直停半秒，慢慢放回。腰不要反弓。</div>
+        <div class="ex-feel">→ 肩膀外側痠</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">3</span><span class="ex-name">啞鈴側平舉</span>
+        <div class="ex-sets">3組 × 15下｜組間休息60秒</div>
+        <div class="ex-how">站姿，手臂微彎，像倒水一樣把啞鈴往兩側舉到肩膀高，停半秒，慢慢放下。不要聳肩。</div>
+        <div class="ex-feel">→ 肩膀上方燒</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">4</span><span class="ex-name">啞鈴二頭彎舉</span>
+        <div class="ex-sets">3組 × 15下｜組間休息45秒</div>
+        <div class="ex-how">手肘固定不動，慢慢彎到最高點頂部停1秒，再慢慢放到底。不要甩身體借力。</div>
+        <div class="ex-feel">→ 手臂前側二頭肌用力</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">5</span><span class="ex-name">三頭肌撐體</span>
+        <div class="ex-sets">3組 × 12下｜組間休息45秒</div>
+        <div class="ex-how">坐椅子邊緣，雙手撐椅子兩側，臀部移到椅子前方懸空腳伸直。手肘彎曲身體往下沉到90度再推回來。背要靠近椅子。</div>
+        <div class="ex-feel">→ 手臂後側三頭肌燒</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">6</span><span class="ex-name">健身環手臂課程</span>
+        <div class="ex-sets">20分鐘，選「手臂」或「上半身」課程</div>
+        <div class="ex-how">跟著節奏認真出力，心跳維持 Zone 2（118–138 bpm），用 Apple Watch 確認。</div>
+      </div>
+    </div>
+    <div class="note note-green">結束後接每天核心10分鐘 👇</div>
+  </div>
+
+  <!-- 游泳 -->
+  <div id="w-swim" class="sub-content">
+    <div class="card" style="font-size:12px;color:var(--muted);margin-bottom:12px;">週二、四（7–8月）／週二、四、六（9月後）｜下午16:00後｜約45分鐘</div>
+    <div class="zone2-box" style="margin-bottom:12px;">
+      <div class="zone2-title">游泳 Zone 2 目標</div>
+      <div style="font-size:13px;color:var(--teal);">慢游＋間歇交替，維持 118–138 bpm<br>Apple Watch 防水可直接戴入水</div>
+    </div>
+    <div class="warm">🔥 下水前熱身3分鐘<br>手臂繞圈各20下→腰部轉動20下→原地小跳30秒</div>
+    <div class="card">
+      <div class="ex-item">
+        <span class="ex-num">1</span><span class="ex-name">慢游熱身</span>
+        <div class="ex-sets">2趟（來回共約50公尺），不計時</div>
+        <div class="ex-how">任何泳姿，讓身體感受水的阻力熱起來，專注呼吸節奏。</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">2</span><span class="ex-name">間歇游泳</span>
+        <div class="ex-sets">8趟 × 25公尺｜初期先從4趟，每週加1趟｜每趟休息30秒</div>
+        <div class="ex-how">趟1–2：自由式盡力游 → 趟3–4：蛙式慢節奏換氣 → 趟5–6：自由式再衝刺 → 趟7–8：蛙式放鬆<br>爬出來休息時看 Apple Watch，確認心跳有在 Zone 2。</div>
+        <div class="ex-feel">→ 心跳加快、會喘，這樣才有燃脂效果</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">3</span><span class="ex-name">浮板踢水</span>
+        <div class="ex-sets">4趟 × 25公尺｜每趟休息20秒</div>
+        <div class="ex-how">雙手抱浮板伸直，只用腳踢水前進。踢水從髖部發力，不是只彎膝蓋。專練大腿小腿線條。</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">4</span><span class="ex-name">緩和慢游</span>
+        <div class="ex-sets">2趟，任意泳姿</div>
+        <div class="ex-how">速度放到最慢，讓呼吸和心跳降下來。不要游完馬上爬出去。</div>
+      </div>
+    </div>
+    <div class="note note-green">回家後接每天核心10分鐘 👇</div>
+  </div>
+
+  <!-- 下半身 -->
+  <div id="w-lower" class="sub-content">
+    <div class="card" style="font-size:12px;color:var(--muted);margin-bottom:12px;">週三｜約50分鐘｜啞鈴3kg×2、健身環</div>
+    <div class="warm">🔥 熱身3分鐘<br>徒手深蹲15下（慢）→原地高抬腿30秒→腳踝繞圈各10下</div>
+    <div class="card">
+      <div class="ex-item">
+        <span class="ex-num">1</span><span class="ex-name">啞鈴深蹲</span>
+        <div class="ex-sets">4組 × 15下｜組間休息60秒</div>
+        <div class="ex-how">雙手各握啞鈴放身體兩側，雙腳與肩同寬腳尖微朝外15度。臀部往後坐往下蹲，膝蓋朝腳尖方向推，蹲到大腿平行地面。用臀部和大腿力量站起，站直時夾緊臀部。</div>
+        <div class="ex-feel">→ 大腿前側和臀部用力，不是膝蓋痛</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">2</span><span class="ex-name">啞鈴弓箭步</span>
+        <div class="ex-sets">3組 × 每側12下｜組間休息60秒</div>
+        <div class="ex-how">右腳往前跨大步，前膝彎90度，後膝接近但不碰地，停半秒。前腳推回站姿換左腳。上半身保持直立。</div>
+        <div class="ex-feel">→ 大腿前後側和臀部都有感覺</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">3</span><span class="ex-name">啞鈴相撲深蹲</span>
+        <div class="ex-sets">3組 × 15下｜組間休息60秒</div>
+        <div class="ex-how">雙腳打開比肩寬腳尖朝外45度，雙手合握一個啞鈴放腿中間。蹲下時膝蓋往外推感覺大腿內側拉開，站起時夾緊臀部。</div>
+        <div class="ex-feel">→ 大腿內側和臀部用力，修大腿內側</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">4</span><span class="ex-name">單腳臀橋</span>
+        <div class="ex-sets">3組 × 每側12下｜組間休息45秒</div>
+        <div class="ex-how">平躺屈膝，右腳抬起伸直只靠左腳。左腳臀部夾緊往上推，腰不要過度拱，頂部停2秒，慢慢放下不完全碰地再推。12下換右腳。</div>
+        <div class="ex-feel">→ 改善骨盆前傾最有效的動作</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">5</span><span class="ex-name">小腿提踵</span>
+        <div class="ex-sets">3組 × 20下｜組間休息30秒</div>
+        <div class="ex-how">站階梯邊緣，腳尖踩邊緣腳跟懸空。踮到最高點停1秒，慢慢放下腳跟低於平面。可扶牆平衡。</div>
+        <div class="ex-feel">→ 小腿後側燒，小腿線條會更好看</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">6</span><span class="ex-name">健身環下半身課程</span>
+        <div class="ex-sets">15分鐘，選「腿部」或「下半身」課程</div>
+        <div class="ex-how">跟著做完，維持 Zone 2 心跳。</div>
+      </div>
+    </div>
+    <div class="note note-green">結束後接每天核心10分鐘 👇</div>
+  </div>
+
+  <!-- 健身房 -->
+  <div id="w-gym" class="sub-content">
+    <div class="card" style="font-size:12px;color:var(--muted);margin-bottom:12px;">7–8月 週一到週六 12:00–15:00｜爬坡機＋器材重訓</div>
+    <div class="zone2-box" style="margin-bottom:12px;">
+      <div class="zone2-title">爬坡機 Zone 2 燃脂</div>
+      <div style="font-size:13px;color:var(--teal);">目標心跳 118–138 bpm<br>坡度調到讓你微喘但還能說話的程度</div>
+    </div>
+    <div class="card">
+      <div class="ex-item">
+        <span class="ex-num">1</span><span class="ex-name">爬坡機 Zone 2 有氧</span>
+        <div class="ex-sets">30–40分鐘</div>
+        <div class="ex-how">開啟 Apple Watch 心率顯示，調整坡度讓心跳維持在 118–138 bpm。太低就加坡度或加速，太高就放慢。這是暑假燃脂的主力，效果比跑步更好、對膝蓋更友善。可以邊聽多益podcast邊做，一石二鳥。</div>
+        <div class="ex-feel">→ 可以說話但有點喘 = 完美</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">2</span><span class="ex-name">健身房器材重訓</span>
+        <div class="ex-sets">剩餘時間，15–20分鐘</div>
+        <div class="ex-how">用健身房器材補強：背部下拉機（練薄背）、腿推機（練大腿）、蝴蝶機（練胸）。比3kg啞鈴重量更夠，效果更好。重量選做15下最後2下吃力的重量。</div>
+      </div>
+    </div>
+    <div class="note note-teal">健身房日在午餐後去，12:00–15:00剛好。讀書讀到12點，去健身房，3點回來繼續讀書。</div>
+    <div class="note note-green">結束後回家接每天核心10分鐘 👇</div>
+  </div>
+
+  <!-- 每天核心 -->
+  <div id="w-core" class="sub-content">
+    <div class="card" style="font-size:12px;color:var(--muted);margin-bottom:12px;">每天都要做｜約10分鐘｜運動結束後接著做｜不需器具</div>
+    <div class="note">這4個動作專門修正骨盆前傾，每天做才有效，不能只有運動日做。</div>
+    <div class="card">
+      <div class="ex-item">
+        <span class="ex-num">1</span><span class="ex-name">死蟲式 Dead Bug</span>
+        <div class="ex-sets">3組 × 每側8下｜組間休息30秒</div>
+        <div class="ex-how">平躺，手臂垂直舉起，膝蓋彎90度抬起小腿平行地面。右手＋左腳同時慢慢往外伸直接近地面但不碰地，腰全程貼地不能拱起，回來換左手＋右腳。速度要慢。</div>
+        <div class="ex-feel">→ 腹部深層在撐，腰如果拱起就只動手不動腳</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">2</span><span class="ex-name">臀橋</span>
+        <div class="ex-sets">3組 × 15下，頂部停2秒｜組間休息30秒</div>
+        <div class="ex-how">平躺屈膝腳掌踩地與肩同寬。臀部夾緊往上推，身體從膝蓋到肩膀成一直線，頂部停2秒，慢慢放下不完全碰地再推。</div>
+        <div class="ex-feel">→ 臀部和大腿後側用力，不是腰在撐</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">3</span><span class="ex-name">平板支撐 Plank</span>
+        <div class="ex-sets">3組 × 30秒（每週加5秒）｜組間休息30秒</div>
+        <div class="ex-how">手肘撐地在肩膀正下方，身體從頭到腳跟打直。臀部不翹不塌，腹部收緊，自然呼吸。</div>
+        <div class="ex-feel">→ 肚子、臀部、大腿都在用力</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">4</span><span class="ex-name">側平板 Side Plank</span>
+        <div class="ex-sets">每側2組 × 20秒｜組間休息30秒</div>
+        <div class="ex-how">側躺，手肘撐地在肩膀正下方，雙腳疊起。臀部抬起身體成一直線，腰不要塌。太難可以膝蓋先彎曲撐地。</div>
+        <div class="ex-feel">→ 側腹和腰側用力，練出腰部線條</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 週六／下雨 -->
+  <div id="w-rain" class="sub-content">
+    <div class="card" style="font-size:12px;color:var(--muted);margin-bottom:12px;">7–8月週六（游泳池休館）或下雨天｜約45分鐘｜全在家</div>
+    <div class="note note-teal">這套用 Switch 拳擊＋健身環替代有氧，搭配 Apple Watch 確認 Zone 2 心跳。</div>
+    <div class="warm">🎮 熱身：Switch 拳擊遊戲 5分鐘<br>選輕量課程或自由模式，讓心跳先拉到 100 bpm 以上。</div>
+    <div class="card">
+      <div class="ex-item">
+        <span class="ex-num">1</span><span class="ex-name">Switch 健身環有氧</span>
+        <div class="ex-sets">20分鐘，選「有氧」模式</div>
+        <div class="ex-how">跟著課程做，目標讓心跳進入 Zone 2（118–138 bpm）。用 Apple Watch 確認，太低就選難度高一點的課程，太高就放慢。</div>
+        <div class="ex-feel">→ 這是主要的有氧燃脂</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">2</span><span class="ex-name">波比跳 Burpee</span>
+        <div class="ex-sets">4組 × 8下｜組間休息45秒</div>
+        <div class="ex-how">站姿→蹲下雙手撐地→雙腳跳後到平板支撐→雙腳跳回→跳起雙手拍頭頂。初期太難：最後改成站起就好，不用跳。</div>
+        <div class="ex-feel">→ 全身都練到，燃脂效率最高</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">3</span><span class="ex-name">Switch 拳擊衝刺</span>
+        <div class="ex-sets">10分鐘，選高強度課程</div>
+        <div class="ex-how">認真出力揮拳，不要敷衍。這段讓心跳衝到 Zone 2 上緣（130–138 bpm）。</div>
+      </div>
+      <div class="ex-item">
+        <span class="ex-num">4</span><span class="ex-name">深蹲跳 Jump Squat</span>
+        <div class="ex-sets">3組 × 10下｜組間休息60秒</div>
+        <div class="ex-how">深蹲蹲到大腿平行地面，用力往上跳。落地時膝蓋微彎緩衝，膝蓋不能內扣，馬上再蹲下接著跳。</div>
+        <div class="ex-feel">→ 大腿和臀部很有感</div>
+      </div>
+    </div>
+    <div class="note note-green">結束後接每天核心10分鐘 👇</div>
+  </div>
+</div>
+
+<!-- 打卡 -->
+<div id="page-checklist" class="page">
+  <div class="section-h">今日任務</div>
+  <div class="note" style="margin-bottom:12px;">每天結束前打卡。關掉重開會重置。</div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:12px;">📘 多益</div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">背30個新單字（Anki）</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">多益閱讀練習（計時）</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">晚上聽力podcast或複習單字</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:12px;">📗 法科</div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">補習班影片看2集</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">整理今天的筆記</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">晚上複習今日重點</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:12px;">💪 運動</div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">今日運動完成</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">Apple Watch 確認 Zone 2 達標</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">每天核心10分鐘（死蟲式＋臀橋＋平板＋側平板）</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:12px;">🧠 自律</div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">讀書時手機放浴室</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div class="check-text">決定好明天要讀什麼</div></div>
+  </div>
+
+  <div style="text-align:center;margin-top:16px;">
+    <div id="score-display" style="font-size:32px;font-weight:700;color:var(--blue);">0 / 11</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px;">今天完成率</div>
+    <div id="score-msg" style="font-size:13px;color:var(--muted);margin-top:8px;"></div>
+  </div>
+</div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+function showSub(id) {
+  document.querySelectorAll('.sub-content').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+function showPhase(group, id) {
+  document.querySelectorAll('[id^="' + (group==='venue'?'v-':'s-') + '"]').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.phase-btn').forEach(b => {
+    if(b.closest('#page-' + (group==='venue'?'home':'schedule'))) b.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+function toggle(el) {
+  const box = el.querySelector('.check-box');
+  const text = el.querySelector('.check-text');
+  box.classList.toggle('done');
+  text.classList.toggle('done');
+  updateScore();
+}
+function updateScore() {
+  const total = document.querySelectorAll('.check-box').length;
+  const done = document.querySelectorAll('.check-box.done').length;
+  document.getElementById('score-display').textContent = done + ' / ' + total;
+  const msgs = ['', '開始了！繼續加油', '有在動！', '一半了！', '快到了！', '太強了！今天全部搞定！'];
+  const idx = done === 0 ? 0 : done < 4 ? 1 : done < 6 ? 2 : done < 8 ? 3 : done < total ? 4 : 5;
+  document.getElementById('score-msg').textContent = msgs[idx];
+}
+function updateCountdown() {
+  const now = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  document.getElementById('today-date').textContent = now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日';
+  document.getElementById('today-day').textContent = '星期' + days[now.getDay()];
+  const toeic = new Date('2025-09-20');
+  const exam = new Date('2025-10-31');
+  const msDay = 86400000;
+  document.getElementById('days-toeic').textContent = Math.max(0, Math.ceil((toeic-now)/msDay));
+  document.getElementById('days-exam').textContent = Math.max(0, Math.ceil((exam-now)/msDay));
+}
+updateCountdown();
+</script>
+</body>
+</html>
